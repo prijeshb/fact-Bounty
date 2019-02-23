@@ -1,14 +1,16 @@
-import scrapy
-from scrapy.spiders import Spider
-from news_sites.items import PulseItem
 from urllib.parse import urljoin
-import datetime
+
+import scrapy
 from scrapy.http import Request
+
+from news_sites.items import PulseItem
+
 
 class PulseSpider(scrapy.Spider):
     name = "pulse"
     allowed_domains = ["pulse.lk"]
     start_urls = ['http://www.pulse.lk/category/fashion/']
+
     def parse(self, response):
         items = []
         for news in response.css('div.blog-content-wrapper'):
@@ -22,20 +24,17 @@ class PulseSpider(scrapy.Spider):
             item['date'] = news_data[2]
             item['comment'] = news_data[6]
             item['news_link'] = news_url
-            r=Request(url=news_url, callback=self.parse_1)
-            r.meta['item']=item
+            r = Request(url=news_url, callback=self.parse_1)
+            r.meta['item'] = item
             yield r
-        yield {'data':items}
+        yield {'data': items}
         next_link = response.xpath('/html/body/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/a[4]')
         next_link = next_link.css('::attr(href)').extract()
-        next_link = next_link[0] # extract_first()
+        next_link = next_link[0]  # extract_first()
         if next_link is not None:
             next_url = urljoin(response.url, str(next_link))
-            print("scrpping "+next_url)
+            print("scrpping " + next_url)
             yield scrapy.Request(next_url, callback=self.parse)
-
-
-
 
     def parse_1(self, response):
         data = response.css('div.gdlr-blog-content ::text').extract()
@@ -44,4 +43,3 @@ class PulseSpider(scrapy.Spider):
         item = response.meta['item']
         item['newsInDetails'] = string
         yield item
-

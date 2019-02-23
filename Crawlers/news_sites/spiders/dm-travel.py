@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from scrapy.spiders import Spider
-from news_sites.items import DailyMirrorSportsItem
-from urllib.parse import urljoin
 from scrapy.http import Request
+
+from news_sites.items import DailyMirrorSportsItem
+
 
 class DailymirrorTravelSpider(scrapy.Spider):
     name = "DMTravel"
@@ -18,12 +18,12 @@ class DailymirrorTravelSpider(scrapy.Spider):
             item = DailyMirrorSportsItem()
             item['news_headline'] = headline
             item['link'] = news_url
-            r=Request(url=news_url, callback=self.parse_1)
-            r.meta['item']=item
+            r = Request(url=news_url, callback=self.parse_1)
+            r.meta['item'] = item
             yield r
             items.append(item)
-            
-        yield {'data':items}
+
+        yield {'data': items}
 
         # next_link = response.css('a.nextpostslink ::attr(href)').extract_first()
         # if next_link is not None:
@@ -32,14 +32,14 @@ class DailymirrorTravelSpider(scrapy.Spider):
         #     yield scrapy.Request(next_url, callback=self.parse)
 
         for i in range(30, 420, 30):
-            next_url = "http://www.dailymirror.lk/travel/"+str(i)
+            next_url = "http://www.dailymirror.lk/travel/" + str(i)
             yield scrapy.Request(next_url, callback=self.parse)
 
     def parse_1(self, response):
         path = response.css('div.row.inner-text p ::text').extract()
         path = [i.strip() for i in path]
         path = list(filter(None, path))
-        s=' '.join(path)
+        s = ' '.join(path)
         item = response.meta['item']
-        item['data']=s
+        item['data'] = s
         yield item

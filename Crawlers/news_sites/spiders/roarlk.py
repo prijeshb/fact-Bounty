@@ -1,15 +1,15 @@
 import scrapy
-from scrapy.spiders import Spider
-from news_sites.items import RoarItem
-from urllib.parse import urljoin
-import datetime
 from scrapy.http import Request
+
+from news_sites.items import RoarItem
+
 
 class RoarSpider(scrapy.Spider):
     name = "roar"
     allowed_domains = ["roar.lk"]
-    start_urls = ['https://roar.lk/category/economy/page/%d/' %(n) for n in range(1, 5)]
-    #start_urls = ['http://roar.lk/features/','http://roar.lk/reports/','http://roar.lk/category/economy/','http://roar.lk/category/editorial/','http://roar.lk/category/environment-wildlife/','http://roar.life/']
+    start_urls = ['https://roar.lk/category/economy/page/%d/' % (n) for n in range(1, 5)]
+
+    # start_urls = ['http://roar.lk/features/','http://roar.lk/reports/','http://roar.lk/category/economy/','http://roar.lk/category/editorial/','http://roar.lk/category/environment-wildlife/','http://roar.life/']
     def parse(self, response):
         items = []
         for news in response.css('div.article-card'):
@@ -21,10 +21,10 @@ class RoarSpider(scrapy.Spider):
             item['news_headline'] = news_data
             item['imgURL'] = imgs
             item['news_link'] = news_url
-            r=Request(url=news_url, callback=self.parse_1)
-            r.meta['item']=item
+            r = Request(url=news_url, callback=self.parse_1)
+            r.meta['item'] = item
             yield r
-        yield {'data':items}
+        yield {'data': items}
 
         '''
         next_link = response.xpath('/html/body/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/a[4]')
@@ -42,7 +42,7 @@ class RoarSpider(scrapy.Spider):
         texts = list(filter(None, data))
         pub_date = texts[3]
         writer = texts[4]
-        tmp=[]
+        tmp = []
         for s in texts:
             s = s.strip()
             if s == "How do you feel about this story?":
@@ -51,9 +51,8 @@ class RoarSpider(scrapy.Spider):
                 tmp.append(s)
 
         string = ' '.join(tmp)
-        string = string.replace('\n',' ')
+        string = string.replace('\n', ' ')
         item = response.meta['item']
         item['newsInDetails'] = string
-        item['date']=pub_date
+        item['date'] = pub_date
         yield item
-

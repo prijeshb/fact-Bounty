@@ -20,11 +20,11 @@ NEWSPIDER_MODULE = 'news_sites.spiders'
 
 #---------------------------------------------------------------------
 ITEM_PIPELINES = {
-    'news_sites.pipelines.MongodbPipeline': 100}
+    'news_sites.pipelines.MongodbPipeline': 100
+}
 MONGODB_SERVER = "localhost"
 MONGODB_PORT = 27017
 MONGODB_DB = "news_db"
-
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from scrapy.spiders import Spider
-from news_sites.items import DailyMirrorSportsItem
-from urllib.parse import urljoin
 from scrapy.http import Request
+
+from news_sites.items import DailyMirrorSportsItem
+
 
 class DM_medicine(scrapy.Spider):
     name = "dm-medicine"
@@ -18,12 +18,12 @@ class DM_medicine(scrapy.Spider):
             item = DailyMirrorSportsItem()
             item['news_headline'] = headline
             item['link'] = news_url
-            r=Request(url=news_url, callback=self.parse_1)
-            r.meta['item']=item
+            r = Request(url=news_url, callback=self.parse_1)
+            r.meta['item'] = item
             yield r
             items.append(item)
-            
-        yield {'newsInDetails':items}
+
+        yield {'newsInDetails': items}
 
         # next_link = response.css('a.nextpostslink ::attr(href)').extract_first()
         # if next_link is not None:
@@ -39,7 +39,7 @@ class DM_medicine(scrapy.Spider):
         path = response.css('div.row.inner-text p ::text').extract()
         path = [i.strip() for i in path]
         path = list(filter(None, path))
-        s=' '.join(path)
+        s = ' '.join(path)
         item = response.meta['item']
-        item['newsInDetails']=s
+        item['newsInDetails'] = s
         yield item

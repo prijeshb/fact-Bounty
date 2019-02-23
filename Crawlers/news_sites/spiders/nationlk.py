@@ -1,15 +1,17 @@
-from urllib.parse import urljoin
-import scrapy
-from scrapy.spiders import Spider
-from news_sites.items import NationlkItem
 import datetime
+from urllib.parse import urljoin
+
+import scrapy
 from scrapy.http import Request
+
+from news_sites.items import NationlkItem
+
 
 class NationLKSpider(scrapy.Spider):
     name = "nationlk"
     allowed_url = ["nation.lk"]
     start_urls = ['http://nation.lk/online/pages/news/page/1']  # home contains all goods
-    today = datetime.datetime.now().strftime("%Y-%m-%d") # get current date
+    today = datetime.datetime.now().strftime("%Y-%m-%d")  # get current date
 
     def parse(self, response):
         items = []
@@ -29,7 +31,7 @@ class NationLKSpider(scrapy.Spider):
             r.meta['item'] = item
             yield r
             items.append(item)
-        yield {"data" : items}
+        yield {"data": items}
 
         '''
         last = response.css('div.page-nav.td-pb-padding-side a.last ::text').extract_first()
@@ -43,7 +45,7 @@ class NationLKSpider(scrapy.Spider):
         '''
         a = response.css('div.page-nav.td-pb-padding-side')
         next_page = a.css('a ::attr(href)').extract()
-        next_page = next_page[len(next_page)-1]
+        next_page = next_page[len(next_page) - 1]
         if next_page is not None:
             next_url = urljoin(response.url, str(next_page))
             print("scrpping " + next_url)
@@ -55,4 +57,3 @@ class NationLKSpider(scrapy.Spider):
         item = response.meta['item']
         item['newsInDetails'] = data
         yield item
-

@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-import scrapy
-from scrapy.spiders import Spider
-from news_sites.items import DailyMirrorSportsItem
 from urllib.parse import urljoin
+
+import scrapy
 from scrapy.http import Request
+
+from news_sites.items import DailyMirrorSportsItem
+
 
 class DailymirrorSportsSpider(scrapy.Spider):
     name = "DailyMirrorSports"
@@ -18,26 +20,24 @@ class DailymirrorSportsSpider(scrapy.Spider):
             item = DailyMirrorSportsItem()
             item['news_headline'] = headline
             item['link'] = news_url
-            r=Request(url=news_url, callback=self.parse_1)
-            r.meta['item']=item
+            r = Request(url=news_url, callback=self.parse_1)
+            r.meta['item'] = item
             yield r
             items.append(item)
-        #if 'data' in item:
-        yield {'data':items}
+        # if 'data' in item:
+        yield {'data': items}
 
         next_link = response.css('a.nextpostslink ::attr(href)').extract_first()
         if next_link is not None:
             next_url = urljoin(response.url, str(next_link))
-            print("scrpping "+next_url)
+            print("scrpping " + next_url)
             yield scrapy.Request(next_url, callback=self.parse)
-
-
 
     def parse_1(self, response):
         path = response.css('div.postarea p ::text').extract()
         path = [i.strip() for i in path]
         path = list(filter(None, path))
-        s=' '.join(path)
+        s = ' '.join(path)
         item = response.meta['item']
-        item['data']=s
+        item['data'] = s
         yield item
